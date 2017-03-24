@@ -4,10 +4,14 @@
 
 package services
 
-import models.RequestPayload
+import models.Request
+
+import scalaz.\/
 
 object RequestService {
-  def getName(data: RequestPayload): String = data.name
+  def getName(data: Request): String = data.name
 
-  def getDetails(data: RequestPayload): String = data.details
+  def getDetails(data: Request): String = data.detail
+
+  def validateName(name: String): String \/ String = ???
 }

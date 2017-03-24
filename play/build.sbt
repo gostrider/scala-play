@@ -8,7 +8,11 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 scalaVersion := "2.11.8"
 
 libraryDependencies += filters
-libraryDependencies ++= Seq(ws, "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test)
+libraryDependencies ++= Seq(
+  ws,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test,
+  "org.scalaz" %% "scalaz-core" % "7.1.0"
+)
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "erikcom.controllers._"

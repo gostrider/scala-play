@@ -6,7 +6,7 @@ package controllers
 
 import javax.inject.Inject
 
-import models.RequestPayload
+import models.Request
 import play.api.libs.json.{Reads, _}
 import play.api.libs.ws._
 import play.api.mvc._
@@ -21,7 +21,7 @@ class CustomController @Inject()(ws: WSClient) extends Controller {
   )
 
   def index: Action[AnyContent] = Action { implicit request =>
-    val jsonPayload: RequestPayload = request.body.asJson.get.as[RequestPayload]
+    val jsonPayload: Request = request.body.asJson.get.as[Request]
 
     //    ws.url("http://staging-chat.chaatz.com:4000").get().map { response => Ok(response.body) }
     Ok("runnable")
