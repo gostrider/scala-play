@@ -7,24 +7,23 @@ package controllers
 import javax.inject.Inject
 
 import models.RequestPayload
-import play.api.libs.json._
-import play.api.libs.json.Reads
-import play.api.mvc.{Action, BodyParser, BodyParsers, Controller}
+import play.api.libs.json.{Reads, _}
+import play.api.libs.ws._
+import play.api.mvc._
+import services.RequestService
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//@Singleton
-class CustomController @Inject() extends Controller {
+class CustomController @Inject()(ws: WSClient) extends Controller {
 
   def validateJSON[A: Reads]: BodyParser[A] = BodyParsers.parse.json.validate(
     _.validate[A].asEither.left.map(e => BadRequest(JsError.toJson(e)))
   )
 
-  def index: Action[RequestPayload] = Action(validateJSON[RequestPayload]) { implicit request =>
-    // Transform json payload as type
-//    val jsonPayload = request.body.asJson.get.as[RequestPayload]
-    // Validate json payload implicitly
-    val jsonPayload = request.body
-    println(jsonPayload)
-    Ok("runnable " + jsonPayload.name)
+  def index: Action[AnyContent] = Action { implicit request =>
+    val jsonPayload: RequestPayload = request.body.asJson.get.as[RequestPayload]
+
+    //    ws.url("http://staging-chat.chaatz.com:4000").get().map { response => Ok(response.body) }
+    Ok("runnable")
   }
 }
