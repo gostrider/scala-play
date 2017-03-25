@@ -4,14 +4,9 @@
 
 package services
 
-import models.Request
-
-import scalaz.\/
-
 object RequestService {
-  def getName(data: Request): String = data.name
+  private val messageType = Seq("text", "image", "voice")
 
-  def getDetails(data: Request): String = data.detail
-
-  def validateName(name: String): String \/ String = ???
+  def isValidType(msgType: String): Option[String] =
+    messageType.find(_ == msgType)
 }

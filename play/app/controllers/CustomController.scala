@@ -7,23 +7,40 @@ package controllers
 import javax.inject.Inject
 
 import models.Request
-import play.api.libs.json.{Reads, _}
 import play.api.libs.ws._
 import play.api.mvc._
-import services.RequestService
+import services.{RequestService, UserService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+//import scala.concurrent.ExecutionContext.Implicits.global
 
 class CustomController @Inject()(ws: WSClient) extends Controller {
-
-  def validateJSON[A: Reads]: BodyParser[A] = BodyParsers.parse.json.validate(
-    _.validate[A].asEither.left.map(e => BadRequest(JsError.toJson(e)))
-  )
-
   def index: Action[AnyContent] = Action { implicit request =>
-    val jsonPayload: Request = request.body.asJson.get.as[Request]
+    val requestPayload: Request = request.body.asJson.get.as[Request]
 
-    //    ws.url("http://staging-chat.chaatz.com:4000").get().map { response => Ok(response.body) }
-    Ok("runnable")
+    if (requestPayload.isGroup) {
+      if (UserService.isGroupID(requestPayload.senderUserID)) UserService.getUser(requestPayload.senderUserID).map { user =>
+        val userID = UserService.getJID(user)
+        RequestService.isValidType(requestPayload.msgType) match {
+          // Pattern match method
+          case None => BadRequest("Invalid message type")
+          case Some(msgType) =>
+            UserService.getUser(requestPayload.recipientUserID).map {
+              // Monadic method handling
+              rUser => Ok("")
+            } getOrElse BadRequest("recipient not found")
+        }
+      } getOrElse BadRequest("sender not found") else BadRequest("Invalid group id")
+    } else {
+      if (UserService.isUserID(requestPayload.senderUserID)) UserService.getUser(requestPayload.senderUserID).map { user =>
+        val userID = UserService.getJID(user)
+        RequestService.isValidType(requestPayload.msgType) match {
+          case None => BadRequest("Invalid message type")
+          case Some(msgType) =>
+            UserService.getUser(requestPayload.recipientUserID).map {
+              rUser => Ok("")
+            } getOrElse BadRequest("recipient not found")
+        }
+      } getOrElse BadRequest("sender not found") else BadRequest("Invalid username")
+    }
   }
 }
