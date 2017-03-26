@@ -1,22 +1,34 @@
-sealed trait SomeType
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scalaz.Scalaz._
+import scalaz._
 
-case class TypeA(name: String) extends SomeType
-
-case class TypeB(name: Int) extends SomeType
-
-case class TypeC(name: Boolean) extends SomeType
-
-val typeA: SomeType = TypeA("a")
-val typeB: SomeType = TypeB(1)
-val typeC: SomeType = TypeC(true)
-
-println(typeA)
-
-val nums = Seq(1, 2, 3)
-
-nums.find(_ == 1) // Some(1)
-nums.find(_ == 5) // None
+//sealed trait SomeType
+//
+//case class TypeA(name: String) extends SomeType
+//
+//case class TypeB(name: Int) extends SomeType
+//
+//case class TypeC(name: Boolean) extends SomeType
+//
+//val typeA: SomeType = TypeA("a")
+//val typeB: SomeType = TypeB(1)
+//val typeC: SomeType = TypeC(true)
+//
+//println(typeA)
+//
+//val nums = Seq(1, 2, 3)
+//
+//nums.find(_ == 1) // Some(1)
+//nums.find(_ == 5) // None
 
 val words = Seq("aa", "bb", "cc")
 
-words.find(_ == "aa")
+val someOps = (k: String) => words.find(_ == k)
+
+val result = for {
+  res <- someOps("aa") \/> "1: key not found"
+  res2 <- someOps(res) \/> "2: key not found"
+} yield (res, res2)
+
+println(result)
