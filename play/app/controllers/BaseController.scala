@@ -27,40 +27,25 @@ class BaseController @Inject() extends Controller {
 
     val payload: Request = request.body.asJson.get.as[Request]
 
-    if (payload.isGroup) {
-      if (UserService.isGroupID(payload.senderUserID))
-        UserService.getUser(payload.senderUserID).map { user =>
+    val isGroupOrNot =
+      if (payload.isGroup) UserService.isGroupID(payload.senderUserID)
+      else UserService.isUserID(payload.senderUserID)
 
-          val senderID = UserService.getJID(user)
-          RequestService.isValidType(payload.msgType) match {
-            // Pattern match method
-            case None => BadRequest("Invalid message type")
-            case Some(msgType) => UserService.getUser(payload.recipientUserID).map {
-              // Monadic method handling
-              recipientID =>
-                Ok("sender:" + senderID +
-                  "\n recipient:" + recipientID +
-                  "\n type:" + msgType)
-            } getOrElse BadRequest("Recipient ID not found")
-          }
+    if (isGroupOrNot)
 
-        } getOrElse BadRequest("Group ID not found") else BadRequest("Invalid group id")
-    } else {
-      if (UserService.isUserID(payload.senderUserID))
-        UserService.getUser(payload.senderUserID).map { user =>
-
-          val senderID = UserService.getJID(user)
-          RequestService.isValidType(payload.msgType) match {
-            case None => BadRequest("Invalid message type")
-            case Some(msgType) => UserService.getUser(payload.recipientUserID).map {
-              recipientID =>
-                Ok("sender:" + senderID +
-                  "\n recipient:" + recipientID +
-                  "\n type:" + msgType)
-            } getOrElse BadRequest("Recipient ID not found")
-          }
-        } getOrElse BadRequest("Sender ID not found") else BadRequest("Invalid username")
-
-    }
+      UserService.getUser(payload.senderUserID).map { user =>
+        val senderID = UserService.getJID(user)
+        RequestService.isValidType(payload.msgType) match {
+          // Pattern match method
+          case None => BadRequest("Invalid message type")
+          case Some(msgType) => UserService.getUser(payload.recipientUserID).map {
+            // Monadic method handling
+            recipientID =>
+              Ok("sender:" + senderID +
+                "\n recipient:" + recipientID +
+                "\n type:" + msgType)
+          } getOrElse BadRequest("Recipient ID not found")
+        }
+      } getOrElse BadRequest("Sender ID not found") else BadRequest("Invalid group id")
   }
 }
