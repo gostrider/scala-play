@@ -22,13 +22,24 @@ import scalaz._
 //nums.find(_ == 1) // Some(1)
 //nums.find(_ == 5) // None
 
-val words = Seq("aa", "bb", "cc")
+//val words = Seq("aa", "bb", "cc")
+//
+//val someOps = (k: String) => words.find(_ == k)
+//
+//val result = for {
+//  res <- someOps("aa") \/> "1: key not found"
+//  res2 <- someOps(res) \/> "2: key not found"
+//} yield (res, res2)
+//
+//println(result)
 
-val someOps = (k: String) => words.find(_ == k)
+// Dependent types
+trait Key { type Value }
 
-val result = for {
-  res <- someOps("aa") \/> "1: key not found"
-  res2 <- someOps(res) \/> "2: key not found"
-} yield (res, res2)
+trait HMap {
+  def get(k: Key): Option[k.Value]
+  def add(k: Key)(value: k.Value): HMap
+}
 
-println(result)
+val sort = new Key { type Value = String }
+val width = new Key { type Value = Int }
