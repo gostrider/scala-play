@@ -98,6 +98,11 @@ object HigherKindedType {
   val fz4: Future[Option[Int]] = fz3.inner
 }
 
+trait Functor[F[_]] {
+  // (<$>) :: a -> (a -> b) -> f a -> f b
+  def map[A, B](a: F[A])(f: A => B): F[B]
+}
+
 trait Monad[M[_]] {
   def `return`[A](a: A): M[A]
 
